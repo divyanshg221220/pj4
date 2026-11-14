@@ -65,6 +65,9 @@
   --color-chart-5: var(--chart-5);
   --color-ink: var(--ink);
   --color-ink-foreground: var(--ink-foreground);
+  --color-studio: var(--studio);
+  --color-silver: var(--silver);
+  --color-aurora: var(--aurora);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -76,7 +79,10 @@
 }
 
 :root {
-  --radius: 1.5rem;
+  --radius: 0.5rem;
+  --studio: oklch(0.91 0.024 285);
+  --silver: oklch(0.75 0.006 250);
+  --aurora: oklch(0.68 0.075 240);
   --background: oklch(0.99 0 0);
   --foreground: oklch(0.15 0 0);
   --card: oklch(0.96 0.003 250);
@@ -89,7 +95,7 @@
   --secondary-foreground: oklch(0.15 0 0);
   --muted: oklch(0.95 0.003 250);
   --muted-foreground: oklch(0.48 0.01 250);
-  --accent: oklch(0.55 0.2 255);
+  --accent: oklch(0.48 0.12 190);
   --accent-foreground: oklch(0.99 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.99 0 0);
@@ -114,6 +120,9 @@
 }
 
 .dark {
+  --studio: oklch(0.91 0.024 285);
+  --silver: oklch(0.75 0.006 250);
+  --aurora: oklch(0.68 0.075 240);
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);
   --card: oklch(0.208 0.042 265.755);
@@ -159,8 +168,27 @@
   }
 }
 
-@layer utilities {
-  .hero-scrim { background: linear-gradient(90deg, oklch(0.1 0.02 250 / 0.75), oklch(0.1 0.02 250 / 0) 65%); }
-  .fade-up { animation: fade-up 0.9s cubic-bezier(.2,.7,.2,1) both; }
+html { scroll-behavior: smooth; scroll-padding-top: 85px; }
+body { font-family: var(--font-sans); letter-spacing: 0; }
+.brand-wordmark { font-size: 21px; font-weight: 800; transform: scaleX(1.08); transform-origin: left; }
+.product-hero { height: min(610px, calc(100svh - 175px)); min-height: 480px; }
+.hero-product { object-position: center; }
+.section-space { padding-top: 90px; padding-bottom: 90px; }
+.section-eyebrow { font-size: 10px; font-weight: 600; color: var(--muted-foreground); }
+.section-title { font-size: 40px; font-weight: 600; line-height: 1.18; }
+.camera-scrim { background: linear-gradient(90deg, var(--ink), transparent 100%); opacity: 0.8; }
+.fade-up { animation: fade-up 0.9s cubic-bezier(.2,.7,.2,1) both; }
+@media (max-width: 767px) {
+  .product-hero { height: 710px; min-height: 0; }
+  .hero-product { height: 280px; top: auto; bottom: 30px; object-position: 72% center; }
+  .hero-copy { justify-content: flex-start; padding-top: 28px; }
+  .hero-copy h1 { font-size: 36px; }
+  .hero-copy .mt-5 { margin-top: 12px; }
+  .hero-copy .mt-8 { margin-top: 20px; gap: 12px; }
+  .hero-copy .mt-8 > :last-child { font-size: 10px; }
+  .hero-discover { bottom: 18px; }
+  .section-space { padding-top: 60px; padding-bottom: 60px; }
+  .section-title { font-size: 32px; }
 }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .fade-up { animation: none; } }
 @keyframes fade-up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }

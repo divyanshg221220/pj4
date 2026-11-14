@@ -28,3 +28,5 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+- Keep the concept product experience on the index route, with section anchors and accessible dialogs for product details and configuration review; this keeps the marketing exercise self-contained without implying a real checkout.
