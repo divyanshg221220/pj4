@@ -92,7 +92,7 @@ function Index() {
         <h2 className="text-4xl font-bold">Pre-order Galaxy Z Aurora</h2>
         <p className="mt-3 text-muted-foreground">Get double the storage free with pre-order.</p>
         <div className="mt-10">
-          <p className="text-sm font-semibold">Color: {colors[color].name}</p>
+          <p className="text-sm font-semibold">Color: {colors[color]?.name}</p>
           <div className="mt-3 flex justify-center gap-4">
             {colors.map((c, i) => (
               <button key={c.name} aria-label={c.name} onClick={() => setColor(i)}
@@ -106,7 +106,7 @@ function Index() {
               className={`rounded-full border px-6 py-2 font-semibold ${i === storage ? "border-primary bg-primary text-primary-foreground" : "border-border"}`}>{s}</button>
           ))}
         </div>
-        <p className="mt-10 text-5xl font-extrabold">${prices[storage].toLocaleString()}</p>
+        <p className="mt-10 text-5xl font-extrabold">${(prices[storage] ?? 0).toLocaleString()}</p>
         <button className="mt-6 rounded-full bg-accent px-10 py-4 font-semibold text-accent-foreground">Pre-order now</button>
       </section>
 
