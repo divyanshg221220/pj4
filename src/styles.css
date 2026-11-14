@@ -66,6 +66,7 @@
   --color-ink: var(--ink);
   --color-ink-foreground: var(--ink-foreground);
   --color-studio: var(--studio);
+  --color-studio-foreground: var(--studio-foreground);
   --color-silver: var(--silver);
   --color-aurora: var(--aurora);
   --color-sidebar: var(--sidebar);
@@ -81,6 +82,7 @@
 :root {
   --radius: 0.5rem;
   --studio: oklch(0.91 0.024 285);
+  --studio-foreground: oklch(0.15 0 0);
   --silver: oklch(0.75 0.006 250);
   --aurora: oklch(0.68 0.075 240);
   --background: oklch(0.99 0 0);
@@ -120,6 +122,7 @@
 }
 
 .dark {
+  --studio-foreground: oklch(0.15 0 0);
   --studio: oklch(0.91 0.024 285);
   --silver: oklch(0.75 0.006 250);
   --aurora: oklch(0.68 0.075 240);
@@ -171,24 +174,70 @@
 html { scroll-behavior: smooth; scroll-padding-top: 85px; }
 body { font-family: var(--font-sans); letter-spacing: 0; }
 .brand-wordmark { font-size: 21px; font-weight: 800; transform: scaleX(1.08); transform-origin: left; }
-.product-hero { height: min(610px, calc(100svh - 175px)); min-height: 480px; }
-.hero-product { object-position: center; }
+.product-hero { height: min(650px, calc(100svh - 175px)); min-height: 500px; color: var(--studio-foreground); }
+.hero-product { object-position: center; animation: product-arrive 1.4s cubic-bezier(.2,.7,.2,1) both; }
+.hero-copy > div { padding-bottom: 34px; }
+.hero-copy h1 { font-size: 48px; }
 .section-space { padding-top: 90px; padding-bottom: 90px; }
 .section-eyebrow { font-size: 10px; font-weight: 600; color: var(--muted-foreground); }
 .section-title { font-size: 40px; font-weight: 600; line-height: 1.18; }
 .camera-scrim { background: linear-gradient(90deg, var(--ink), transparent 100%); opacity: 0.8; }
 .fade-up { animation: fade-up 0.9s cubic-bezier(.2,.7,.2,1) both; }
 @media (max-width: 767px) {
-  .product-hero { height: 710px; min-height: 0; }
-  .hero-product { height: 280px; top: auto; bottom: 30px; object-position: 72% center; }
-  .hero-copy { justify-content: flex-start; padding-top: 28px; }
+  .product-hero { display: flex; flex-direction: column; height: auto; min-height: 0; }
+  .hero-product { position: relative; inset: auto; order: 2; height: 250px; object-position: 72% center; }
+  .hero-copy { order: 1; width: 100%; height: auto; justify-content: flex-start; padding-top: 28px; }
+  .hero-copy > div { padding-bottom: 24px; }
   .hero-copy h1 { font-size: 36px; }
   .hero-copy .mt-5 { margin-top: 12px; }
   .hero-copy .mt-8 { margin-top: 20px; gap: 12px; }
   .hero-copy .mt-8 > :last-child { font-size: 10px; }
-  .hero-discover { bottom: 18px; }
+  .hero-discover { display: none; }
   .section-space { padding-top: 60px; padding-bottom: 60px; }
   .section-title { font-size: 32px; }
 }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .fade-up { animation: none; } }
+.reveal-pending { opacity: 0; transform: translateY(24px); }
+.reveal-pending.is-revealed { opacity: 1; transform: none; transition: opacity 700ms ease, transform 700ms cubic-bezier(.2,.7,.2,1); }
+#ai article:nth-child(2) { transition-delay: 100ms; }
+#ai article:nth-child(3) { transition-delay: 200ms; }
+.product-nav-link { position: relative; }
+.product-nav-link::after { content: ""; position: absolute; height: 2px; bottom: -10px; left: 0; right: 0; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 250ms ease; }
+.product-nav-link[aria-current]::after { transform: scaleX(1); }
+.product-nav-link[aria-current] { color: var(--accent); }
+.mobile-menu { animation: menu-arrive 220ms ease both; max-height: calc(100svh - 80px); overflow-y: auto; }
+.mobile-menu .product-nav-link::after { bottom: 4px; }
+.product-page .ui-button { transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, transform 200ms ease; }
+.product-page .ui-button:active { transform: scale(.97); }
+.product-page .ui-button[aria-pressed=true] { animation: selection-settle 260ms ease; }
+.product-page .ui-button > svg { transition: transform 200ms ease; }
+.product-page .ui-button[aria-pressed] { min-width: 44px; min-height: 44px; }
+.product-page a:focus-visible { outline: 2px solid var(--ring); outline-offset: 5px; }
+.skip-link { position: fixed; top: 8px; left: 8px; z-index: 60; padding: 12px 20px; color: var(--primary-foreground); background: var(--primary); transform: translateY(-150%); }
+.skip-link:focus { transform: none; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .product-page .ui-button:not([aria-pressed]):hover { transform: translateY(-2px); }
+  .product-page .ui-button:not([aria-pressed]):hover > svg { transform: translateX(3px); }
+  #design img { transition: transform 900ms cubic-bezier(.2,.7,.2,1); }
+  #design img:hover { transform: scale(1.025); }
+}
+@media (min-width: 1440px) { .hero-copy h1 { font-size: 54px; } }
+@media (max-width: 360px) {
+  .product-page > .sticky > div { gap: 6px; padding-left: 16px; padding-right: 16px; }
+  .product-page > .sticky > div > a { font-size: 12px; white-space: nowrap; }
+  .product-page > .sticky .ui-button { padding-left: 12px; padding-right: 12px; }
+  .product-page > .sticky .ui-button[aria-controls] { padding: 0; }
+}
+@keyframes product-arrive { from { opacity: 0; transform: scale(1.025); } to { opacity: 1; transform: scale(1); } }
+@keyframes menu-arrive { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+@keyframes selection-settle { from { transform: scale(.93); } to { transform: scale(1); } }
+@keyframes accordion-down { from { height: 0; } to { height: var(--radix-accordion-content-height); } }
+@keyframes accordion-up { from { height: var(--radix-accordion-content-height); } to { height: 0; } }
+[data-slot="unused"] { display: initial; }
+[data-state="open"].animate-accordion-down, [data-state="open"][class*="animate-accordion-down"] { animation: accordion-down 260ms ease-out; }
+[data-state="closed"][class*="animate-accordion-up"] { animation: accordion-up 220ms ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .product-page *, .product-page *::before, .product-page *::after, [role="dialog"], [data-state="open"], [data-state="closed"] { animation: none !important; transition: none !important; }
+  .reveal-pending { opacity: 1; transform: none; }
+}
 @keyframes fade-up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }

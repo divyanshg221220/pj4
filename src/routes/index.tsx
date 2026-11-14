@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { ArrowDown, ArrowRight, ArrowUpRight, Check, ChevronRight, Cpu, Menu, Minus, Plus, ShieldCheck, Smartphone, Sparkles, Truck, X, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowDown, ArrowRight, ArrowUpRight, Check, ChevronRight, Cpu, Menu, ShieldCheck, Smartphone, Sparkles, Truck, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useProductMotion } from "@/hooks/use-product-motion";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import hero from "@/assets/aurora-studio.jpg";
 import winter from "@/assets/hero-winter.jpg";
@@ -39,11 +41,28 @@ function Index() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [review, setReview] = useState(false);
   const [film, setFilm] = useState(false);
-  const [faq, setFaq] = useState<number | null>(null);
+  const { pageRef, activeSection } = useProductMotion();
+  useEffect(() => {
+    if (!mobileMenu) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setMobileMenu(false);
+      document.getElementById("product-menu-toggle")?.focus();
+    };
+    const desktop = window.matchMedia("(min-width: 768px)");
+    const closeOnDesktop = () => { if (desktop.matches) setMobileMenu(false); };
+    document.addEventListener("keydown", closeOnEscape);
+    desktop.addEventListener("change", closeOnDesktop);
+    return () => {
+      document.removeEventListener("keydown", closeOnEscape);
+      desktop.removeEventListener("change", closeOnDesktop);
+    };
+  }, [mobileMenu]);
   const selectedColor = colors[color] ?? { name: "Titanium Silver", cls: "bg-silver" };
   const price = prices[storage] ?? 1919;
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div ref={pageRef} className="product-page min-h-screen bg-background text-foreground">
+      <a href="#main-content" className="skip-link">Skip to content</a>
       <header className="border-b border-border bg-background">
         <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-6 px-6 lg:px-12">
           <a href="#overview" aria-label="Samsung home" className="brand-wordmark">SAMSUNG</a>
@@ -54,16 +73,16 @@ function Index() {
       <div className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-4 px-6 lg:px-12">
           <a href="#overview" className="text-base font-bold">Galaxy Z Aurora</a>
-          <nav aria-label="Product navigation" className="hidden items-center gap-7 text-xs font-medium md:flex">{nav.map(n => <a key={n.id} className="transition-colors hover:text-accent" href={`#${n.id}`}>{n.name}</a>)}</nav>
+          <nav aria-label="Product navigation" className="hidden items-center gap-7 text-xs font-medium md:flex">{nav.map(n => <a key={n.id} aria-current={activeSection === n.id ? "location" : undefined} className="product-nav-link transition-colors hover:text-accent" href={`#${n.id}`}>{n.name}</a>)}</nav>
           <div className="flex items-center gap-2">
             <Button asChild className="rounded-full px-5"><a href="#buy">Pre-order <ArrowUpRight /></a></Button>
-            <Button variant="ghost" size="icon" className="md:hidden" aria-label={mobileMenu ? "Close menu" : "Open menu"} onClick={() => setMobileMenu(!mobileMenu)}>{mobileMenu ? <X /> : <Menu />}</Button>
+            <Button id="product-menu-toggle" variant="ghost" size="icon" className="md:hidden" aria-label={mobileMenu ? "Close menu" : "Open menu"} aria-expanded={mobileMenu} aria-controls="product-mobile-menu" onClick={() => setMobileMenu(!mobileMenu)}>{mobileMenu ? <X /> : <Menu />}</Button>
           </div>
         </div>
-        {mobileMenu && <nav aria-label="Mobile product navigation" className="flex flex-col border-t border-border px-6 py-4 md:hidden">{nav.map(n => <a key={n.id} href={`#${n.id}`} onClick={() => setMobileMenu(false)} className="py-3 text-sm">{n.name}</a>)}</nav>}
+        {mobileMenu && <nav id="product-mobile-menu" aria-label="Mobile product navigation" className="mobile-menu flex flex-col border-t border-border px-6 py-4 md:hidden">{nav.map(n => <a key={n.id} aria-current={activeSection === n.id ? "location" : undefined} href={`#${n.id}`} onClick={() => setMobileMenu(false)} className="product-nav-link py-3 text-sm">{n.name}</a>)}</nav>}
       </div>
 
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <section id="overview" className="product-hero relative isolate overflow-hidden bg-studio">
           <img src={hero} alt="Titanium Galaxy Z Aurora open beside its silver triple-camera back" width={1920} height={1080} className="hero-product absolute inset-0 h-full w-full object-cover" fetchPriority="high" />
           <div className="hero-copy relative mx-auto flex h-full max-w-[1440px] flex-col justify-center px-6 lg:px-12">
@@ -107,7 +126,7 @@ function Index() {
         <section id="buy" className="border-y border-border bg-muted"><div className="mx-auto grid max-w-[1320px] gap-12 px-6 py-20 md:grid-cols-2 lg:px-12"><div className="flex flex-col justify-center"><p className="section-eyebrow">YOUR NEXT CHAPTER</p><h2 className="section-title mt-4">Make it yours.</h2><img src={hero} alt="Galaxy Z Aurora product design; shown in Titanium Silver" width={1920} height={1080} loading="lazy" className="mt-7 aspect-[4/3] w-full rounded-lg object-cover object-right" /><p className="mt-3 text-center text-[10px] text-muted-foreground">Titanium Silver shown. Other finishes are concept selections.</p></div><div className="flex flex-col justify-center"><h3 className="text-2xl font-semibold">Galaxy Z Aurora</h3><p className="mt-3 text-sm text-muted-foreground">A world of possibility. In your pocket.</p><div className="mt-8 border-t border-border pt-7"><p className="text-xs font-semibold">Choose your finish <span className="ml-2 font-normal text-muted-foreground">{selectedColor.name}</span></p><div className="mt-4 flex gap-4">{colors.map((c,i) => <Button key={c.name} variant="ghost" size="icon" title={c.name} aria-label={c.name} aria-pressed={color === i} onClick={() => setColor(i)} className={`h-9 w-9 rounded-full border-4 border-background p-0 ring-offset-2 ring-offset-muted ${c.cls} ${color === i ? "ring-1 ring-foreground" : "ring-1 ring-border"}`} />)}</div></div><div className="mt-7"><p className="text-xs font-semibold">Choose your storage</p><div className="mt-4 grid grid-cols-3 gap-3">{sizes.map((s,i) => <Button key={s} variant="outline" aria-pressed={storage === i} onClick={() => setStorage(i)} className={`h-12 rounded-md shadow-none ${storage === i ? "border-foreground bg-foreground text-background hover:bg-foreground/90 hover:text-background" : "bg-transparent"}`}>{s}</Button>)}</div></div><div className="mt-8 flex flex-wrap items-end justify-between gap-3 border-t border-border pt-7"><p className="text-3xl font-semibold" aria-live="polite">${price.toLocaleString("en-US")}</p><span className="text-xs text-muted-foreground">Concept pricing · USD</span></div><Button className="mt-6 h-12 w-full rounded-full" onClick={() => setReview(true)}>Pre-order now <ArrowUpRight /></Button><p className="mt-4 text-center text-[11px] text-muted-foreground">PJ4 concept experience. No payment required.</p><div className="mt-7 flex justify-center gap-6 border-t border-border pt-5 text-[11px] text-muted-foreground"><span className="flex items-center gap-2"><Truck className="h-4 w-4" /> Delivery concept</span><span className="flex items-center gap-2"><ShieldCheck className="h-4 w-4" /> No charges collected</span></div></div></div></section>
 
         <section id="specs" className="section-space mx-auto max-w-[1000px] px-6"><p className="section-eyebrow">THE DETAILS THAT MATTER</p><h2 className="section-title mt-4">Small fold. Big numbers.</h2><dl className="mt-10 grid sm:grid-cols-2">{[["Display", '7.8” Dynamic AMOLED 2X'],["Camera", "200MP · AI Nightography"],["Battery", "5,000mAh · Fast charging"],["Build", "Titanium frame · 8.9mm folded"],["Storage", "256GB / 512GB / 1TB"],["Intelligence", "Galaxy AI built in"]].map(([k,v]) => <div key={k} className="border-b border-border py-6 sm:odd:mr-10"><dt className="text-xs text-muted-foreground">{k}</dt><dd className="mt-2 text-sm font-semibold">{v}</dd></div>)}</dl></section>
-        <section className="mx-auto max-w-[1000px] px-6 pb-20"><h2 className="text-2xl font-semibold">A few things you might be wondering.</h2><div className="mt-7">{questions.map((f,i) => <div key={f.q} className="border-b border-border"><Button variant="ghost" className="h-auto w-full justify-between whitespace-normal rounded-none px-0 py-5 text-left hover:bg-transparent" aria-expanded={faq === i} aria-controls={`answer-${i}`} onClick={() => setFaq(faq === i ? null : i)}>{f.q}{faq === i ? <Minus /> : <Plus />}</Button>{faq === i && <p id={`answer-${i}`} className="max-w-2xl pb-6 text-sm leading-7 text-muted-foreground">{f.a}</p>}</div>)}</div></section>
+        <section className="mx-auto max-w-[1000px] px-6 pb-20"><h2 className="text-2xl font-semibold">A few things you might be wondering.</h2><Accordion type="single" collapsible className="mt-7">{questions.map((f,i) => <AccordionItem key={f.q} value={`question-${i}`}><AccordionTrigger className="gap-4 py-5 focus-visible:outline-2 focus-visible:outline-ring">{f.q}</AccordionTrigger><AccordionContent className="max-w-2xl pb-6 leading-7 text-muted-foreground">{f.a}</AccordionContent></AccordionItem>)}</Accordion></section>
       </main>
       <footer className="border-t border-border bg-muted px-6 py-9 lg:px-12"><div className="mx-auto max-w-[1320px]"><div className="flex flex-wrap items-center justify-between gap-4"><a href="#overview" className="brand-wordmark">SAMSUNG</a><a href="#overview" className="flex items-center gap-2 text-xs">Back to top <ArrowUpRight className="h-4 w-4" /></a></div><p className="mt-7 max-w-3xl text-[10px] leading-5 text-muted-foreground">Independent PJ4 training project. Not affiliated with Samsung. Galaxy Z Aurora is a fictional product; all specifications, offers and prices are illustrative. Product images are AI-generated.</p><div className="mt-6 flex flex-wrap justify-between gap-3 border-t border-border pt-5 text-[10px] text-muted-foreground"><span>© 2026 PJ4 · Product marketing concept</span><span>Imagined for a world of possibility.</span></div></div></footer>
 
