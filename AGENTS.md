@@ -31,3 +31,4 @@ use the editor.
 
 - Keep the concept product experience on the index route, with section anchors and accessible dialogs for product details and configuration review; this keeps the marketing exercise self-contained without implying a real checkout.
 - Scope scroll animation and section tracking to the product page hook, with observer cleanup and reduced-motion support; this preserves server-rendered content and avoids global scroll side effects.
+- Render the scroll-unfold phone with effect-loaded Three.js in a dedicated sticky section; hinge rotation follows native scroll, WebGL resources are disposed on unmount, and reduced motion shows an open static phone.

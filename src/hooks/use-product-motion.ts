@@ -8,7 +8,7 @@ export function useProductMotion() {
     const page = pageRef.current;
     if (!page) return;
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const targets = page.querySelectorAll("main > section:not(#overview) > div, #specs > *, #ai article");
+    const targets = page.querySelectorAll("main > section:not(#overview):not(.unfold-section) > div, #specs > *, #ai article");
     const reveal = new IntersectionObserver(entries => {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;

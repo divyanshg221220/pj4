@@ -4,6 +4,7 @@ import { ArrowDown, ArrowRight, ArrowUpRight, Check, ChevronRight, Cpu, Menu, Sh
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useProductMotion } from "@/hooks/use-product-motion";
+import { UnfoldPhone } from "@/components/unfold-phone";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import hero from "@/assets/aurora-studio.jpg";
 import winter from "@/assets/hero-winter.jpg";
@@ -101,6 +102,8 @@ function Index() {
           </div>
           <span className="absolute bottom-6 right-6 hidden text-[10px] text-muted-foreground md:block lg:right-12">Product concept. Images simulated.</span>
         </section>
+
+        <UnfoldPhone />
 
         <section id="features" className="border-b border-border">
           <div className="mx-auto grid max-w-[1320px] grid-cols-2 gap-y-8 px-6 py-9 md:grid-cols-4 md:py-10">

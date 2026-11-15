@@ -7,3 +7,7 @@
 - [x] Fix tight-screen text and photo overlap and menu accessibility.
 - [x] Add scroll reveals, product motion, animated controls, and expandable answers with reduced-motion support.
 - [x] Test navigation, configuration, dialogs, and motion across screen sizes.
+
+# Scroll unfolding
+- [x] Add a scroll-controlled 3D phone with a reversible hinge and reduced-motion fallback.
+- [x] Verify folded, half-open, and open states on desktop and mobile.
