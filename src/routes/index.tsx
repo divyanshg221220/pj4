@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { ArrowDown, ArrowRight, ArrowUpRight, Check, ChevronRight, Cpu, Menu, ShieldCheck, Smartphone, Sparkles, Truck, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -42,6 +42,26 @@ function Index() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [review, setReview] = useState(false);
   const [film, setFilm] = useState(false);
+  const [order, setOrder] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const submitOrder = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = Object.fromEntries(new FormData(event.currentTarget)) as Record<string, string>;
+    const next: Record<string, string> = {};
+    if (!data.name?.trim() || data.name.trim().length < 2) next.name = "Please enter your full name.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email ?? "")) next.email = "Please enter a valid email.";
+    if (!data.address?.trim() || data.address.trim().length < 5) next.address = "Please enter a delivery address.";
+    setErrors(next);
+    if (Object.keys(next).length) return;
+    const id = `AUR-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+    try {
+      const saved = JSON.parse(localStorage.getItem("aurora-orders") ?? "[]");
+      saved.push({ id, name: data.name, email: data.email, color: selectedColor.name, storage: sizes[storage], price, at: new Date().toISOString() });
+      localStorage.setItem("aurora-orders", JSON.stringify(saved));
+    } catch { /* storage unavailable; confirmation still shows */ }
+    setOrder(id);
+  };
+  const setReviewOpen = (open: boolean) => { setReview(open); if (!open) { setOrder(null); setErrors({}); } };
   const { pageRef, activeSection } = useProductMotion();
   useEffect(() => {
     if (!mobileMenu) return;
@@ -133,8 +153,8 @@ function Index() {
       </main>
       <footer className="border-t border-border bg-muted px-6 py-9 lg:px-12"><div className="mx-auto max-w-[1320px]"><div className="flex flex-wrap items-center justify-between gap-4"><a href="#overview" className="brand-wordmark">SAMSUNG</a><a href="#overview" className="flex items-center gap-2 text-xs">Back to top <ArrowUpRight className="h-4 w-4" /></a></div><p className="mt-7 max-w-3xl text-[10px] leading-5 text-muted-foreground">Independent PJ4 training project. Not affiliated with Samsung. Galaxy Z Aurora is a fictional product; all specifications, offers and prices are illustrative. Product images are AI-generated.</p><div className="mt-6 flex flex-wrap justify-between gap-3 border-t border-border pt-5 text-[10px] text-muted-foreground"><span>© 2026 PJ4 · Product marketing concept</span><span>Imagined for a world of possibility.</span></div></div></footer>
 
-      <Dialog open={review} onOpenChange={setReview}><DialogContent><DialogTitle>Your Galaxy, your way.</DialogTitle><DialogDescription>Review your concept configuration. This demonstration does not place an order or collect payment.</DialogDescription><div className="flex items-center gap-5 border-y border-border py-5"><img src={phone} alt="Galaxy Z Aurora" width={1200} height={1200} className="h-24 w-24 rounded-md object-cover" /><div><p className="font-semibold">Galaxy Z Aurora</p><p className="mt-2 text-sm text-muted-foreground">{selectedColor.name} · {sizes[storage]}</p><p className="mt-3 font-semibold">${price.toLocaleString("en-US")}</p></div></div><p className="flex items-center gap-2 text-sm text-muted-foreground"><Check className="h-4 w-4 text-accent" /> Your selection is ready to explore.</p><Button onClick={() => setReview(false)}>Continue exploring <ChevronRight /></Button></DialogContent></Dialog>
-      <Dialog open={film} onOpenChange={setFilm}><DialogContent className="max-w-3xl"><DialogTitle>A new world unfolds.</DialogTitle><DialogDescription>Meet the Galaxy Z Aurora concept.</DialogDescription><img src={hero} alt="The open Galaxy Z Aurora and titanium camera design" width={1920} height={1080} className="w-full rounded-md" /><div className="grid grid-cols-3 gap-3 border-t border-border pt-4 text-center text-xs"><span>7.8” immersive display</span><span>200MP camera</span><span>Galaxy AI</span></div><Button asChild onClick={() => setFilm(false)}><a href="#buy">Make it yours <ArrowRight /></a></Button></DialogContent></Dialog>
+      <Dialog open={review} onOpenChange={setReviewOpen}><DialogContent><DialogTitle>{order ? "Pre-order confirmed." : "Your Galaxy, your way."}</DialogTitle><DialogDescription>{order ? `Reference ${order}. This is a demo — no payment was taken.` : "Review your configuration and reserve it. This demonstration does not collect payment."}</DialogDescription><div className="flex items-center gap-5 border-y border-border py-5"><img src={phone} alt="Galaxy Z Aurora" width={1200} height={1200} className="h-24 w-24 rounded-md object-cover" /><div><p className="font-semibold">Galaxy Z Aurora</p><p className="mt-2 text-sm text-muted-foreground">{selectedColor.name} · {sizes[storage]}</p><p className="mt-3 font-semibold">${price.toLocaleString("en-US")}</p></div></div>{order ? <><p className="flex items-center gap-2 text-sm text-muted-foreground"><Check className="h-4 w-4 text-accent" /> We saved your reservation on this device.</p><Button onClick={() => setReviewOpen(false)}>Continue exploring <ChevronRight /></Button></> : <form noValidate onSubmit={submitOrder} className="grid gap-3"><label className="grid gap-1 text-xs font-medium">Full name<input name="name" type="text" autoComplete="name" aria-invalid={!!errors.name} className="h-10 rounded-md border border-input bg-background px-3 text-sm font-normal" />{errors.name && <span className="text-destructive font-normal">{errors.name}</span>}</label><label className="grid gap-1 text-xs font-medium">Email<input name="email" type="email" autoComplete="email" aria-invalid={!!errors.email} className="h-10 rounded-md border border-input bg-background px-3 text-sm font-normal" />{errors.email && <span className="text-destructive font-normal">{errors.email}</span>}</label><label className="grid gap-1 text-xs font-medium">Delivery address<input name="address" type="text" autoComplete="street-address" aria-invalid={!!errors.address} className="h-10 rounded-md border border-input bg-background px-3 text-sm font-normal" />{errors.address && <span className="text-destructive font-normal">{errors.address}</span>}</label><Button type="submit" className="mt-2">Confirm pre-order <ChevronRight /></Button></form>}</DialogContent></Dialog>
+      <Dialog open={film} onOpenChange={setFilm}><DialogContent className="max-w-3xl"><DialogTitle>A new world unfolds.</DialogTitle><DialogDescription>Meet the Galaxy Z Aurora concept.</DialogDescription><img src={hero} alt="The open Galaxy Z Aurora and titanium camera design" width={1920} height={1080} className="w-full rounded-md" /><div className="grid grid-cols-3 gap-3 border-t border-border pt-4 text-center text-xs"><span>7.8” immersive display</span><span>200MP camera</span><span>Galaxy AI</span></div><Button asChild><a href="#buy" onClick={() => setFilm(false)}>Make it yours <ArrowRight /></a></Button></DialogContent></Dialog>
     </div>
   );
 }

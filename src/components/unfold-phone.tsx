@@ -20,7 +20,7 @@ export function UnfoldPhone() {
       // Resolve semantic CSS tokens to sRGB for WebGL materials.
       const swatch = document.createElement("canvas");
       swatch.width = swatch.height = 1;
-      const ctx = swatch.getContext("2d");
+      const ctx = swatch.getContext("2d", { willReadFrequently: true });
       if (!ctx) return;
       const color = (token: string) => {
         ctx.clearRect(0, 0, 1, 1);
